@@ -46,108 +46,156 @@ export async function POST(req: Request) {
       return NextResponse.json({ moduleData: fallback, source: 'local_static_guest' });
     }
 
-    // 2. Verificar si ya existe un caché persistente en Supabase para el usuario y módulo
-    const { data: cached, error: cacheFetchError } = await supabase
+    const currentLevel = getLevelRange(userPoints);
+
+    // 2. Verificar el caché de TODOS los módulos para este usuario
+    const { data: cachedList, error: cacheFetchError } = await supabase
       .from('user_custom_modules')
       .select('*')
-      .eq('user_id', userId)
-      .eq('module_id', requestedModuleId)
-      .maybeSingle();
+      .eq('user_id', userId);
 
     if (cacheFetchError) {
       console.warn("⚠️ Error consultando caché de módulos personalizados:", cacheFetchError.message);
     }
 
-    if (cached) {
-      const cachedLevel = getLevelRange(cached.points_at_generation);
-      const currentLevel = getLevelRange(userPoints);
+    const cachedMap = new Map<number, any>();
+    if (cachedList) {
+      cachedList.forEach(item => {
+        cachedMap.set(item.module_id, item);
+      });
+    }
 
-      // Si el nivel del usuario sigue siendo el mismo en el que se generó, retornamos el caché
-      if (cachedLevel === currentLevel) {
-        console.log(`⚡ Cargando módulo ${requestedModuleId} desde caché de base de datos (Nivel ${currentLevel}) para usuario ${userId}.`);
-        return NextResponse.json({ moduleData: cached.module_data, source: 'database_cache' });
+    // 3. Determinar qué módulos faltan o están desactualizados para el nivel actual
+    const modulesToGenerate: number[] = [];
+    for (let m = 1; m <= 4; m++) {
+      const cachedModule = cachedMap.get(m);
+      const needsGeneration = !cachedModule || getLevelRange(cachedModule.points_at_generation) !== currentLevel;
+      if (needsGeneration) {
+        modulesToGenerate.push(m);
       }
-      
-      console.log(`🔄 El usuario ${userId} cambió de nivel (${cachedLevel} -> ${currentLevel}). Invalidando caché y regenerando módulo.`);
     }
 
-    // 3. Si no hay caché o cambió el nivel, llamar a Qwen para generar la nueva versión personalizada
-    const { systemPrompt, userPrompt } = buildModulePrompt(requestedModuleId, userPoints);
-    console.log(`🤖 Generando módulo dinámico ${requestedModuleId} (Nivel ${getLevelRange(userPoints)}) con Qwen para usuario ${userId}.`);
+    // Función auxiliar para generar un módulo individual con Qwen y guardarlo
+    const generateAndSaveModule = async (modId: number) => {
+      try {
+        const { systemPrompt, userPrompt } = buildModulePrompt(modId, userPoints);
+        console.log(`🤖 Generando módulo dinámico ${modId} (Nivel ${currentLevel}) con Qwen para usuario ${userId}.`);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 95000); // 95 segundos de abort
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 segundos por llamada
 
-    const apiRes = await fetch('https://llm-qpkgcaf3gif9hgpv.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.QWEN_API_KEY}`
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model: 'qwen-plus',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        stream: false,
-        temperature: 0.2
-      })
-    });
-    clearTimeout(timeoutId);
+        const apiRes = await fetch('https://llm-qpkgcaf3gif9hgpv.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.QWEN_API_KEY}`
+          },
+          signal: controller.signal,
+          body: JSON.stringify({
+            model: 'qwen-plus',
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userPrompt }
+            ],
+            stream: false,
+            temperature: 0.2
+          })
+        });
+        clearTimeout(timeoutId);
 
-    if (!apiRes.ok) {
-      throw new Error(`Qwen API returned status ${apiRes.status}`);
+        if (!apiRes.ok) {
+          throw new Error(`Qwen API returned status ${apiRes.status}`);
+        }
+
+        const data = await apiRes.json();
+        let textResponse = data.choices?.[0]?.message?.content || "";
+
+        // Limpieza de tags
+        textResponse = textResponse
+          .replace(/<\|im_start\|>[\s\S]*?<\|im_end\|>/g, '')
+          .replace(/<\|im_start\|>/g, '')
+          .replace(/<\|im_end\|>/g, '')
+          .replace(/<think>[\s\S]*?<\/think>/g, '')
+          .replace(/<\/think>/g, '')
+          .replace(/<think>/g, '')
+          .replace(/```json/g, '')
+          .replace(/```/g, '')
+          .trim();
+
+        const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error("No JSON found in Qwen response");
+        }
+
+        const parsedModule = JSON.parse(jsonMatch[0]);
+
+        if (!parsedModule.sections || parsedModule.sections.length === 0) {
+          throw new Error("Invalid module structure generated by Qwen");
+        }
+
+        // Guardar o actualizar la lección personalizada en Supabase
+        const { error: upsertError } = await supabase
+          .from('user_custom_modules')
+          .upsert({
+            user_id: userId,
+            module_id: modId,
+            points_at_generation: userPoints,
+            module_data: parsedModule,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,module_id' });
+
+        if (upsertError) {
+          console.error(`❌ Error guardando lección ${modId} en caché de Supabase:`, upsertError.message);
+        } else {
+          console.log(`✅ lección personalizada del módulo ${modId} guardada en base de datos.`);
+        }
+
+        return parsedModule;
+      } catch (err: any) {
+        console.warn(`⚠️ API de Qwen falló para el módulo ${modId}. Usando fallback local. Error:`, err.message);
+        const fallback = getLocalFallback(modId);
+        if (fallback) {
+          return fallback;
+        }
+        throw err;
+      }
+    };
+
+    // 4. Si hay módulos pendientes de generación, ejecutarlos en paralelo
+    let generatedResultsMap = new Map<number, any>();
+    if (modulesToGenerate.length > 0) {
+      console.log(`🔄 Módulos que requieren generación/actualización para Nivel ${currentLevel}: ${modulesToGenerate.join(', ')}`);
+      const results = await Promise.all(
+        modulesToGenerate.map(modId => generateAndSaveModule(modId))
+      );
+      modulesToGenerate.forEach((modId, index) => {
+        generatedResultsMap.set(modId, results[index]);
+      });
     }
 
-    const data = await apiRes.json();
-    let textResponse = data.choices?.[0]?.message?.content || "";
-
-    // Limpieza de tags
-    textResponse = textResponse
-      .replace(/<\|im_start\|>[\s\S]*?<\|im_end\|>/g, '')
-      .replace(/<\|im_start\|>/g, '')
-      .replace(/<\|im_end\|>/g, '')
-      .replace(/<think>[\s\S]*?<\/think>/g, '')
-      .replace(/<\/think>/g, '')
-      .replace(/<think>/g, '')
-      .replace(/```json/g, '')
-      .replace(/```/g, '')
-      .trim();
-
-    const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("No JSON found in Qwen response");
-    }
-
-    const parsedModule = JSON.parse(jsonMatch[0]);
-
-    if (!parsedModule.sections || parsedModule.sections.length === 0) {
-      throw new Error("Invalid module structure generated by Qwen");
-    }
-
-    // 4. Guardar o actualizar la lección personalizada generada en Supabase (caché persistente)
-    const { error: upsertError } = await supabase
-      .from('user_custom_modules')
-      .upsert({
-        user_id: userId,
-        module_id: requestedModuleId,
-        points_at_generation: userPoints,
-        module_data: parsedModule,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'user_id,module_id' });
-
-    if (upsertError) {
-      console.error("❌ Error guardando lección en caché de Supabase:", upsertError.message);
+    // 5. Devolver los datos del módulo solicitado
+    let finalModuleData: any = null;
+    if (modulesToGenerate.includes(requestedModuleId)) {
+      finalModuleData = generatedResultsMap.get(requestedModuleId);
     } else {
-      console.log(`✅ lección personalizada del módulo ${requestedModuleId} guardada en base de datos.`);
+      const cached = cachedMap.get(requestedModuleId);
+      if (cached) {
+        finalModuleData = cached.module_data;
+      }
     }
 
-    return NextResponse.json({ moduleData: parsedModule, source: 'qwen_generated' });
+    if (!finalModuleData) {
+      console.log(`ℹ️ Módulo solicitado ${requestedModuleId} no encontrado en caché ni en resultados. Usando fallback.`);
+      finalModuleData = getLocalFallback(requestedModuleId);
+    }
+
+    return NextResponse.json({
+      moduleData: finalModuleData,
+      source: modulesToGenerate.includes(requestedModuleId) ? 'qwen_generated_batch' : 'database_cache'
+    });
 
   } catch (error: any) {
-    console.warn(`⚠️ API de Qwen falló para el módulo ${requestedModuleId}. Usando fallback local. Error:`, error.message);
+    console.error(`❌ Error general en generación de módulos. Reintentando con fallback para módulo ${requestedModuleId}:`, error.message);
     const fallback = getLocalFallback(requestedModuleId);
     
     if (fallback) {
