@@ -9,6 +9,7 @@ import RewardModal from '@/components/ui/RewardModal';
 import ModuleWizard from '@/components/layout/ModuleWizard';
 import AICoachFeedback from '@/components/ui/AICoachFeedback';
 import { useAuth } from '@/components/providers/AuthProvider';
+import staticModule from '../../../content/01-como-funcionan.json';
 
 export default function CienciaDelHabito() {
   const { session } = useAuth();
@@ -29,6 +30,15 @@ export default function CienciaDelHabito() {
   useEffect(() => {
     async function loadDynamicModule() {
       setIsLoading(true);
+
+      // Si el usuario es un invitado, cargar el JSON estático inmediatamente sin hacer llamadas a la API
+      if (userId === 'guest') {
+        console.log("🌱 Cargando contenido estático local para usuario invitado (0ms).");
+        setModuleData(staticModule);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const userPoints = Number(localStorage.getItem(`user_points_${userId}`) || '0');
         const res = await fetch('/api/modules/generate', {
@@ -44,6 +54,8 @@ export default function CienciaDelHabito() {
         }
       } catch (err) {
         console.error("Fallo cargando módulo dinámico:", err);
+        // Fallback local en caso de error de red
+        setModuleData(staticModule);
       } finally {
         setIsLoading(false);
       }
@@ -58,7 +70,8 @@ export default function CienciaDelHabito() {
     setIsSaving(true);
     const { error } = await supabase.from('user_habits').insert({
       module_id: 1,
-      habit_data: habitState
+      habit_data: habitState,
+      ...(userId !== 'guest' ? { user_id: userId } : {})
     });
     setIsSaving(false);
     if (!error) {

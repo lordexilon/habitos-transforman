@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import TheoryCard from '@/components/modules/TheoryCard';
 import EcosystemAudit from '@/components/modules/EcosystemAudit';
@@ -9,6 +8,7 @@ import RewardModal from '@/components/ui/RewardModal';
 import ModuleWizard from '@/components/layout/ModuleWizard';
 import AICoachFeedback from '@/components/ui/AICoachFeedback';
 import { useAuth } from '@/components/providers/AuthProvider';
+import staticModule from '../../../content/04-ecosistema.json';
 
 export default function EcosistemaVidaSana() {
   const { session } = useAuth();
@@ -28,6 +28,15 @@ export default function EcosistemaVidaSana() {
   useEffect(() => {
     async function loadDynamicModule() {
       setIsLoading(true);
+
+      // Si el usuario es un invitado, cargar el JSON estático inmediatamente sin hacer llamadas a la API
+      if (userId === 'guest') {
+        console.log("🌱 Cargando contenido estático local para usuario invitado (0ms).");
+        setModuleData(staticModule);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const userPoints = Number(localStorage.getItem(`user_points_${userId}`) || '0');
         const res = await fetch('/api/modules/generate', {
@@ -43,6 +52,8 @@ export default function EcosistemaVidaSana() {
         }
       } catch (err) {
         console.error("Fallo cargando módulo dinámico:", err);
+        // Fallback local en caso de error de red
+        setModuleData(staticModule);
       } finally {
         setIsLoading(false);
       }
@@ -57,7 +68,8 @@ export default function EcosistemaVidaSana() {
     setIsSaving(true);
     const { error } = await supabase.from('user_habits').insert({
       module_id: 4,
-      habit_data: habitState
+      habit_data: habitState,
+      ...(userId !== 'guest' ? { user_id: userId } : {})
     });
     setIsSaving(false);
     if (!error) {

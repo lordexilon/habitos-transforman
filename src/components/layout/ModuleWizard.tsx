@@ -83,6 +83,26 @@ export default function ModuleWizard({ children, onComplete, isSaving, moduleIma
             />
           </div>
         </div>
+
+        {/* CTA or AI Badge */}
+        {userId === 'guest' ? (
+          <div className="mx-6 mb-5 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100/70 flex flex-col gap-1.5 shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🌱</span>
+              <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Contenido Estándar</p>
+            </div>
+            <p className="text-xs text-amber-700 font-medium leading-relaxed">
+              Estás viendo la versión estándar. <a href="/auth" className="text-indigo-600 font-extrabold hover:underline">Regístrate gratis</a> para activar la personalización con IA de tu Coach.
+            </p>
+          </div>
+        ) : (
+          <div className="mx-6 mb-5 p-3 rounded-2xl bg-indigo-50/50 border border-indigo-100/40 flex items-center gap-2.5 shadow-sm">
+            <span className="text-base">🌟</span>
+            <p className="text-xs font-bold text-indigo-800">
+              Contenido adaptado por IA para tu Nivel {points >= 200 ? '3 (Avanzado)' : points >= 100 ? '2 (Intermedio)' : '1 (Principiante)'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Content Area */}
