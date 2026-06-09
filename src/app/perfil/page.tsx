@@ -20,10 +20,10 @@ export default function ProfilePage() {
 
   useEffect(() => {
     // Para el MVP, mostramos los datos locales.
-    // En el futuro, podríamos hacer fetch a Supabase user_profiles.
-    setLocalPoints(localStorage.getItem('user_points') || '0');
-    setLocalStreak(localStorage.getItem('user_streak') || '0');
-  }, []);
+    const userId = session?.user?.id || 'guest';
+    setLocalPoints(localStorage.getItem(`user_points_${userId}`) || '0');
+    setLocalStreak(localStorage.getItem(`user_streak_${userId}`) || '0');
+  }, [session]);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);

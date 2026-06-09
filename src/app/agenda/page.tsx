@@ -27,8 +27,9 @@ export default function AgendaPage() {
   const { session } = useAuth();
 
   useEffect(() => {
-    // Cargar agenda de localStorage
-    const savedAgenda = localStorage.getItem('user_agenda');
+  useEffect(() => {
+    const userId = session?.user?.id || 'guest';
+    const savedAgenda = localStorage.getItem(`user_agenda_${userId}`);
     if (savedAgenda) {
       setTasks(JSON.parse(savedAgenda));
     } else {
@@ -39,9 +40,10 @@ export default function AgendaPage() {
       ]);
     }
     
-    const read = localStorage.getItem('pill_read_today');
+    const userId = session?.user?.id || 'guest';
+    const read = localStorage.getItem(`pill_read_today_${userId}`);
     if (read) setPillRead(true);
-  }, []);
+  }, [session]);
 
   const triggerToast = (type: 'success' | 'passive-aggressive', message: string) => {
     setToastType(type);
@@ -61,8 +63,9 @@ export default function AgendaPage() {
         if (isCompleting) {
           triggerToast('success', '¡Eso es! Un paso más cerca de tu meta. 🔥');
           // Add points
-          const currentPoints = Number(localStorage.getItem('user_points') || '0');
-          localStorage.setItem('user_points', (currentPoints + 10).toString());
+          const userId = session?.user?.id || 'guest';
+          const currentPoints = Number(localStorage.getItem(`user_points_${userId}`) || '0');
+          localStorage.setItem(`user_points_${userId}`, (currentPoints + 10).toString());
           window.dispatchEvent(new Event('pointsUpdated'));
         } else {
           triggerToast('passive-aggressive', '¿En serio lo desmarcaste? No me hagas decepcionarme. 🦉');
@@ -71,8 +74,9 @@ export default function AgendaPage() {
       }
       return t;
     });
+    const userId = session?.user?.id || 'guest';
     setTasks(newTasks);
-    localStorage.setItem('user_agenda', JSON.stringify(newTasks));
+    localStorage.setItem(`user_agenda_${userId}`, JSON.stringify(newTasks));
   };
 
   const completePill = () => {
@@ -81,10 +85,11 @@ export default function AgendaPage() {
       return;
     }
 
+    const userId = session?.user?.id || 'guest';
     setPillRead(true);
-    localStorage.setItem('pill_read_today', 'true');
-    const currentPoints = Number(localStorage.getItem('user_points') || '0');
-    localStorage.setItem('user_points', (currentPoints + 25).toString());
+    localStorage.setItem(`pill_read_today_${userId}`, 'true');
+    const currentPoints = Number(localStorage.getItem(`user_points_${userId}`) || '0');
+    localStorage.setItem(`user_points_${userId}`, (currentPoints + 25).toString());
     window.dispatchEvent(new Event('pointsUpdated'));
     triggerToast('success', '¡Sabiduría absorbida! +25 puntos. 🧠');
   };

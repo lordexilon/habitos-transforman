@@ -42,26 +42,27 @@ export default function CoachChat() {
     }
     loadHabits();
     
-    // Cargar historial de chat si existe
-    const saved = localStorage.getItem('coach_chat_history');
+    // Cargar historial de chat
+    const userId = session?.user?.id || 'guest';
+    const saved = localStorage.getItem(`chat_history_${userId}`);
     if (saved) {
       try { setMessages(JSON.parse(saved)); } catch (e) {}
     }
-  }, []);
+  }, [session]);
 
   // Guardar historial
   useEffect(() => {
+    const userId = session?.user?.id || 'guest';
     if (messages.length > 1) {
-      localStorage.setItem('coach_chat_history', JSON.stringify(messages));
+      localStorage.setItem(`chat_history_${userId}`, JSON.stringify(messages));
     }
-  }, [messages]);
+  }, [messages, session]);
 
   const handleClearHistory = () => {
     if (confirm('¿Estás seguro de que quieres borrar el historial de la conversación?')) {
-      localStorage.removeItem('coach_chat_history');
-      setMessages([
-        { role: 'assistant', content: '¡Hola! Soy tu Coach de SCAHábitos. ¿Cómo va tu progreso hoy? Si tuviste algún problema con tus rutinas o tienes dudas sobre la ciencia de los hábitos, cuéntamelo y lo resolvemos.' }
-      ]);
+      const userId = session?.user?.id || 'guest';
+      setMessages(INITIAL_MESSAGE);
+      localStorage.removeItem(`chat_history_${userId}`);
     }
   };
 
@@ -89,17 +90,16 @@ export default function CoachChat() {
 
     const userMsg = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    const newMessages = [...messages, { role: 'user', content: userMsg } as Message];
+    setMessages(newMessages);
     setIsTyping(true);
 
     try {
-      const apiMessages = [...messages, { role: 'user', content: userMsg }];
-      
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: apiMessages,
+          messages: newMessages,
           userHabits: userHabits.length > 0 ? userHabits : null
         })
       });
@@ -107,7 +107,6 @@ export default function CoachChat() {
       if (!res.ok) throw new Error('Error al conectar con el Coach');
       if (!res.body) throw new Error('No stream body');
 
-      // Preparar mensaje vacío para el asistente que se llenará por streaming
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
       const reader = res.body.getReader();
@@ -140,15 +139,17 @@ export default function CoachChat() {
                     return newMsgs;
                   });
                 }
-              } catch (e) {
-                // Ignore partial JSON chunks
-              }
+              } catch (e) {}
             }
           }
         }
       }
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Lo siento, tuve un problema procesando tu mensaje. Asegúrate de que Ollama esté corriendo.' }]);
+      console.error(error);
+      const userId = session?.user?.id || 'guest';
+      const updatedMessages = [...newMessages, { role: 'assistant', content: 'Lo siento, he tenido un problema de conexión. ¿Podemos intentarlo de nuevo?' } as Message];
+      setMessages(updatedMessages);
+      localStorage.setItem(`chat_history_${userId}`, JSON.stringify(updatedMessages));
     } finally {
       setIsTyping(false);
     }
@@ -164,11 +165,18 @@ export default function CoachChat() {
       });
       if (res.ok) {
         const data = await res.json();
-        // Generar IDs para cada tarea
+        const userId = session?.user?.id || 'guest';
         const agendaWithIds = data.agenda.map((t: any) => ({ ...t, id: Math.random().toString(36).substring(7), completed: false }));
-        localStorage.setItem('user_agenda', JSON.stringify(agendaWithIds));
+        
+        localStorage.setItem(`user_agenda_${userId}`, JSON.stringify(agendaWithIds));
+        
+        // Update chat history
+        const updatedMessages = [...messages, { role: 'assistant', content: `¡Excelente! He agregado: **${data.agenda.length} tareas** a tu agenda.` } as Message];
+        setMessages(updatedMessages);
+        localStorage.setItem(`chat_history_${userId}`, JSON.stringify(updatedMessages));
+
         // Reset pill
-        localStorage.removeItem('pill_read_today');
+        localStorage.removeItem(`pill_read_today_${userId}`);
         router.push('/agenda');
       }
     } catch (error) {

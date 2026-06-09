@@ -1,22 +1,25 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Logo from '@/components/ui/Logo';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 export default function TopBar() {
+  const { session } = useAuth();
   const [points, setPoints] = useState(0);
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
+    const userId = session?.user?.id || 'guest';
     // Escuchar el evento personalizado de ganancia de puntos
     const handleStorageChange = () => {
-      setPoints(Number(localStorage.getItem('user_points') || '0'));
-      setStreak(Number(localStorage.getItem('user_streak') || '0'));
+      setPoints(Number(localStorage.getItem(`user_points_${userId}`) || '0'));
+      setStreak(Number(localStorage.getItem(`user_streak_${userId}`) || '0'));
     };
 
     handleStorageChange();
     window.addEventListener('pointsUpdated', handleStorageChange);
     return () => window.removeEventListener('pointsUpdated', handleStorageChange);
-  }, []);
+  }, [session]);
 
   return (
     <div className="fixed top-0 left-0 right-0 mx-auto w-full max-w-md h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 z-50 shadow-sm">
