@@ -51,7 +51,7 @@ REGLAS:
 
     const model = 'qwen-plus'; // Usamos qwen-plus que es la versión optimizada
 
-    const apiResponse = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+    const apiResponse = await fetch('https://llm-qpkgcaf3gif9hgpv.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',

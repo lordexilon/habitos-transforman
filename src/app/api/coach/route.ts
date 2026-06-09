@@ -47,7 +47,7 @@ Responde ÚNICAMENTE con un objeto JSON válido con estas claves (sin texto ante
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 90000);
       
-      const apiRes = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
+      const apiRes = await fetch('https://llm-qpkgcaf3gif9hgpv.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
