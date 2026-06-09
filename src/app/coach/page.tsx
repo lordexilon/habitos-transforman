@@ -1,8 +1,10 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, ArrowLeft, Loader2, Sparkles, Trash2 } from 'lucide-react';
+import { Send, Bot, User, ArrowLeft, Loader2, Sparkles, Trash2, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/components/providers/AuthProvider';
+import PaywallModal from '@/components/ui/PaywallModal';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -19,6 +21,10 @@ export default function CoachChat() {
   const [isTyping, setIsTyping] = useState(false);
   const [isGeneratingAgenda, setIsGeneratingAgenda] = useState(false);
   const [userHabits, setUserHabits] = useState<any[]>([]);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallType, setPaywallType] = useState<'register' | 'paywall'>('register');
+  const [interactionCount, setInteractionCount] = useState('0');
+  const { session } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll
@@ -59,9 +65,27 @@ export default function CoachChat() {
     }
   };
 
-  const handleSend = async (e?: React.FormEvent) => {
-    e?.preventDefault();
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!input.trim() || isTyping) return;
+
+    // Verificar límite de uso
+    let interactions = Number(interactionCount);
+
+    if (!session && interactions >= 5) {
+      setPaywallType('register');
+      setShowPaywall(true);
+      return;
+    }
+
+    if (session && interactions >= 10) {
+      setPaywallType('paywall');
+      setShowPaywall(true);
+      return;
+    }
+
+    localStorage.setItem('coach_interactions', (interactions + 1).toString());
+    setInteractionCount((interactions + 1).toString());
 
     const userMsg = input.trim();
     setInput('');
@@ -241,24 +265,37 @@ export default function CoachChat() {
 
       {/* Input Area */}
       <div className="absolute bottom-[64px] left-0 right-0 bg-white border-t p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40">
-        <form onSubmit={handleSend} className="flex gap-2">
+        <form onSubmit={handleSend} className="flex gap-2 relative">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Dime, ¿qué te frenó hoy?"
-            className="flex-1 bg-gray-100 text-gray-800 rounded-full px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm font-medium"
+            className="flex-1 bg-gray-100 text-gray-800 rounded-full px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm font-medium pr-12"
             disabled={isTyping}
           />
           <button
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="bg-indigo-600 text-white rounded-full p-3.5 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md"
+            className="bg-indigo-600 text-white rounded-full p-3.5 hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md absolute right-1 top-1 bottom-1 flex items-center justify-center"
           >
             {isTyping ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
           </button>
         </form>
+        <div className="text-center mt-2 text-[10px] font-semibold text-gray-400">
+          Interacciones: {interactionCount} / {session ? '10' : '5'}
+        </div>
       </div>
+
+      <PaywallModal 
+        isOpen={showPaywall}
+        type={paywallType}
+        title={paywallType === 'register' ? 'Límite Gratuito Alcanzado' : 'Desbloquea Coach Ilimitado'}
+        description={paywallType === 'register' 
+          ? 'Has gastado tus 5 interacciones gratuitas del día. Crea una cuenta gratis para desbloquear más capacidad de IA.'
+          : 'Has alcanzado tu límite diario de IA gratuita. Desbloquea rutinas ilimitadas y personalizadas por el precio de un café al mes.'}
+        onClose={() => setShowPaywall(false)}
+      />
     </div>
   );
 }

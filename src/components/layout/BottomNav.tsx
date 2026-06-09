@@ -2,18 +2,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Brain, Target, ShieldBan, HeartPulse, Home, MessageCircleMore, CheckSquare, BookOpen } from 'lucide-react';
+import { Brain, Target, ShieldBan, HeartPulse, Home, MessageCircleMore, CheckSquare, BookOpen, User } from 'lucide-react';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 const navItems = [
   { name: 'Inicio', href: '/', icon: Home },
   { name: 'Agenda', href: '/agenda', icon: CheckSquare },
   { name: 'Libro', href: '/libro', icon: BookOpen },
   { name: 'Coach', href: '/coach', icon: MessageCircleMore },
-  { name: 'Sistemas', href: '/sistemas-vs-metas', icon: Target },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { session } = useAuth();
 
   // El usuario solicitó mantener el BottomNav visible en el chat
 
@@ -36,6 +37,16 @@ export default function BottomNav() {
             </Link>
           );
         })}
+        {/* Enlace Condicional a Perfil/Auth */}
+        <Link
+          href={session ? '/perfil' : '/auth'}
+          className={`flex flex-col items-center justify-center w-full h-full space-y-1 ${
+            pathname === '/auth' || pathname === '/perfil' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <User className={`w-6 h-6 ${pathname === '/auth' || pathname === '/perfil' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
+          <span className="text-[10px] font-medium leading-none">{session ? 'Perfil' : 'Ingresar'}</span>
+        </Link>
       </div>
     </nav>
   );

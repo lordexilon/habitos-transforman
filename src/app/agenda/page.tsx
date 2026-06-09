@@ -5,6 +5,8 @@ import BottomNav from '@/components/layout/BottomNav';
 import DuolingoToast from '@/components/ui/DuolingoToast';
 import { BookOpen, CheckCircle2, Circle, Flame, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/providers/AuthProvider';
+import PaywallModal from '@/components/ui/PaywallModal';
 
 type Task = {
   id: string;
@@ -21,6 +23,8 @@ export default function AgendaPage() {
   const [toastType, setToastType] = useState<'success' | 'passive-aggressive'>('success');
   const [showToast, setShowToast] = useState(false);
   const [pillRead, setPillRead] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const { session } = useAuth();
 
   useEffect(() => {
     // Cargar agenda de localStorage
@@ -46,6 +50,11 @@ export default function AgendaPage() {
   };
 
   const toggleTask = (id: string) => {
+    if (!session) {
+      setShowPaywall(true);
+      return;
+    }
+
     const newTasks = tasks.map(t => {
       if (t.id === id) {
         const isCompleting = !t.completed;
@@ -67,6 +76,11 @@ export default function AgendaPage() {
   };
 
   const completePill = () => {
+    if (!session) {
+      setShowPaywall(true);
+      return;
+    }
+
     setPillRead(true);
     localStorage.setItem('pill_read_today', 'true');
     const currentPoints = Number(localStorage.getItem('user_points') || '0');
@@ -153,6 +167,13 @@ export default function AgendaPage() {
         message={toastMessage} 
         type={toastType} 
         onClose={() => setShowToast(false)} 
+      />
+      <PaywallModal 
+        isOpen={showPaywall}
+        type="register"
+        title="¡Has ganado puntos!"
+        description="Crea tu cuenta gratuita ahora para guardar tus rachas, agenda diaria y asegurar que tu progreso no se pierda jamás."
+        onClose={() => setShowPaywall(false)}
       />
       <BottomNav />
     </div>

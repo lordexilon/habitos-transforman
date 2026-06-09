@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/layout/BottomNav";
 import TopBar from "@/components/layout/TopBar";
+import AuthProvider from "@/components/providers/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,11 +37,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.className} min-h-screen bg-gray-50 text-gray-900 pb-16`}>
-        <TopBar />
-        <main className="max-w-md mx-auto min-h-screen bg-white shadow-xl pt-16">
-          {children}
-        </main>
-        <BottomNav />
+        <AuthProvider>
+          <TopBar />
+          <main className="max-w-md mx-auto min-h-screen bg-white shadow-xl pt-16">
+            {children}
+          </main>
+          <BottomNav />
+        </AuthProvider>
       </body>
     </html>
   );
