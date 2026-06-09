@@ -79,7 +79,7 @@ Responde ÚNICAMENTE con un objeto JSON válido con estas claves (sin texto ante
       
       // 1. Eliminar tokens especiales del chat template de Qwen
       textResponse = textResponse
-        .replace(/<\|im_start\|>.*?<\|im_end\|>/gs, '')  // bloques im_start/im_end
+        .replace(/<\|im_start\|>[\s\S]*?<\|im_end\|>/g, '')  // bloques im_start/im_end
         .replace(/<\|im_start\|>/g, '')
         .replace(/<\|im_end\|>/g, '')
         .replace(/<think>[\s\S]*?<\/think>/g, '')          // bloques de pensamiento
