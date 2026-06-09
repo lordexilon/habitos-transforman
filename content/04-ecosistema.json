@@ -1,0 +1,53 @@
+{
+  "module": 4,
+  "title": "El Ecosistema de Vida Sana",
+  "sections": [
+    {
+      "id": "theory-1",
+      "type": "theory",
+      "title": "La Base de una Vida Saludable",
+      "image": "/images/mod4_theory1_health_1780950294412.png",
+      "content": "A veces tomamos atajos con nuestra salud en la búsqueda del éxito, lo cual resulta en enfermedades evitables. Los pilares son: hacer ejercicio (30 min/día), desayunar siempre, nutrición saludable a lo largo del día (frutas, nueces, controlar porciones), masticar lentamente, evitar edulcorantes artificiales, mantenerse hidratado, higiene dental (hilo dental) y dormir de 7 a 9 horas."
+    },
+    {
+      "id": "action-1",
+      "type": "interactive_node",
+      "component": "EcosystemAudit",
+      "title": "Paso 1: Auditoría Personal",
+      "description": "Selecciona las áreas de tu ecosistema personal que consideras que necesitas mejorar urgentemente para crear un entorno más sano.",
+      "props": {
+        "action": "audit_ecosystem",
+        "ecosystem_areas": [
+          "Calidad de Sueño (7-9 horas)",
+          "Hidratación (Beber agua regular)",
+          "Actividad Física (30 min diarios)",
+          "Nutrición y Desayuno",
+          "Retos Mentales e Intelectuales"
+        ]
+      }
+    },
+    {
+      "id": "theory-2",
+      "type": "theory",
+      "title": "Hábitos en Familia y Entorno",
+      "image": "/images/mod4_theory2_family_1780950304402.png",
+      "content": "Tu ecosistema incluye a tu familia. Para crear un entorno ideal, es vital hablar sobre salud con los niños, comer juntos para promover la salud mental, hacer ejercicio en familia, y limpiar juntos. Además, es clave establecer 'tiempos sin tecnología' en el hogar y enseñar a los niños desde temprano a gestionar el estrés mediante la respiración."
+    },
+    {
+      "id": "action-2",
+      "type": "interactive_node",
+      "component": "FamilyChallengePlanner",
+      "title": "Paso 2: Reto del Entorno",
+      "description": "¿Qué hábito o actividad grupal implementarás en tu hogar para mejorar el ecosistema completo? Hazlo divertido, conviértelo en un juego.",
+      "props": {
+        "action": "plan_challenge",
+        "suggested_challenges": [
+          "Cena familiar libre de pantallas",
+          "Noche de juegos de mesa semanal",
+          "Caminata o actividad física de fin de semana juntos",
+          "15 minutos de limpieza en equipo diaria"
+        ]
+      }
+    }
+  ]
+}

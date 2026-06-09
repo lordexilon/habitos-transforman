@@ -1,0 +1,59 @@
+{
+  "module": 2,
+  "title": "Sistemas vs. Metas",
+  "sections": [
+    {
+      "id": "theory-1",
+      "type": "theory",
+      "title": "El Problema con las Fechas Límite",
+      "image": "/images/mod2_theory1_deadline_1780950229425.png",
+      "content": "El error habitual que cometemos al establecer objetivos es fijar una fecha límite, pero no un horario. Nos enfocamos en el propósito final y no en el proceso. Si no conseguimos el objetivo a tiempo, nos sentimos fracasados y abandonamos, aunque hayamos mejorado. La mejor forma de emprender es detallar un horario para operar en vez de una fecha límite."
+    },
+    {
+      "id": "action-1",
+      "type": "interactive_node",
+      "component": "ScheduleBuilder",
+      "title": "Paso 1: Detalla tu Horario",
+      "description": "En lugar de decir 'Quiero perder 10 kilos para verano', diseña el sistema. Selecciona la frecuencia y el horario exacto para tu acción repetitiva.",
+      "props": {
+        "action": "set_schedule",
+        "suggested_frequencies": [
+          "Lunes, miércoles y viernes por la mañana",
+          "Todos los días después del trabajo",
+          "Cada noche antes de dormir",
+          "Fines de semana por la tarde"
+        ]
+      }
+    },
+    {
+      "id": "theory-2",
+      "type": "theory",
+      "title": "Los Hábitos Clave (Keystone Habits)",
+      "image": "/images/mod2_theory2_keystone_1780950240478.png",
+      "content": "¿Y si deseas cambiar numerosas cosas en tu vida a la vez? La ciencia sugiere concentrarse en un solo propósito. Aquí entran los 'hábitos clave', que son rutinas que naturalmente ponen en orden el resto de tu vida. Por ejemplo, el fitness. Cuando haces ejercicio, tiendes a comer mejor, dormir más rápido y ser más productivo. Las fichas de dominó comienzan a caer por sí solas."
+    },
+    {
+      "id": "action-2",
+      "type": "interactive_node",
+      "component": "KeystoneHabitSelector",
+      "title": "Paso 2: Identifica tu Hábito Clave",
+      "description": "¿Qué es aquello que cuando lo haces tu día avanza mejor? Selecciona un hábito clave que impactará positivamente otras áreas de tu vida.",
+      "props": {
+        "action": "select_keystone",
+        "suggested_keystones": [
+          "Hacer 30 min de ejercicio",
+          "Mantener mi espacio de trabajo limpio",
+          "Dormir 8 horas diarias",
+          "Meditar o planificar el día en la mañana"
+        ]
+      }
+    },
+    {
+      "id": "theory-3",
+      "type": "theory",
+      "title": "La Acción Triple y Prioridades",
+      "image": "/images/mod2_theory3_triple_1780950251110.png",
+      "content": "La acción exitosa es triple: Mental (ver y creer), Elaboración (estudiar y entrenar) y Física (trabajar directamente). Además, dado que el tiempo es limitado, divide tu enorme lista en solo 4 objetivos fundamentales para no abrumarte. El orden, la limpieza y encontrar cooperación recíproca (ganar-ganar) son esenciales para progresar."
+    }
+  ]
+}

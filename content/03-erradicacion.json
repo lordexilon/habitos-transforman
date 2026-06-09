@@ -1,0 +1,69 @@
+{
+  "module": 3,
+  "title": "Erradicación y Reemplazo",
+  "sections": [
+    {
+      "id": "theory-1",
+      "type": "theory",
+      "title": "El Estrés y El Aburrimiento",
+      "image": "/images/mod3_theory1_stress_1780950261409.png",
+      "content": "Tus hábitos, buenos o malos, están en tu vida por una razón. Comúnmente, los malos hábitos son sencillamente una manera de lidiar con el estrés y el aburrimiento. Ya que brindan algún tipo de provecho biológico o emocional (como el alivio rápido), el consejo de 'simplemente deja de hacerlo' casi nunca funciona."
+    },
+    {
+      "id": "action-1",
+      "type": "interactive_node",
+      "component": "BadHabitAnalyzer",
+      "title": "Paso 1: Analiza la Causa",
+      "description": "El primer paso es la conciencia. Haz un rastreo. ¿Cuándo sucede tu mal hábito? ¿Qué lo desata? Identifica si tu mal hábito actual responde principalmente a una necesidad de aliviar el estrés o combatir el aburrimiento.",
+      "props": {
+        "action": "analyze_cause",
+        "causes": [
+          "Busco aliviar estrés o ansiedad",
+          "Busco entretenimiento o combatir el aburrimiento",
+          "Es un impulso físico/biológico",
+          "Es una respuesta a un entorno o persona específica"
+        ]
+      }
+    },
+    {
+      "id": "theory-2",
+      "type": "theory",
+      "title": "No lo elimines, Reemplázalo",
+      "image": "/images/mod3_theory2_replace_1780950273238.png",
+      "content": "No puedes eliminar un mal hábito sin dejar un vacío; debes sustituirlo con un accionar más saludable que aborde esa misma necesidad. Si fumas cuando estás estresado, necesitas hallar una nueva manera de lidiar con el estrés. Además, es clave eliminar los causantes desencadenantes (ej. oculta el control remoto, tira la comida chatarra)."
+    },
+    {
+      "id": "action-2",
+      "type": "interactive_node",
+      "component": "SubstituteHabitSelector",
+      "title": "Paso 2: Elige tu Sustituto",
+      "description": "Define un plan seguro. ¿Qué vas a hacer exactamente cuando llegue ese estrés o aburrimiento? Escribe tu nuevo hábito sustituto.",
+      "props": {
+        "action": "select_substitute",
+        "suggested_substitutes": [
+          "Beber un vaso de agua en su lugar",
+          "Hacer 5 respiraciones profundas",
+          "Salir a dar una caminata breve",
+          "Llamar a un amigo o aliado"
+        ]
+      }
+    },
+    {
+      "id": "theory-3",
+      "type": "theory",
+      "title": "El Poder del 'Pero' y Planificar el Fracaso",
+      "image": "/images/mod3_theory3_but_1780950284324.png",
+      "content": "Siempre nos juzgamos duramente cuando fallamos. Usa la palabra 'pero' para sobrepasar el diálogo negativo. Si dices 'Soy un fracaso', añade 'pero estoy desarrollando un importante cambio en mi vida'. Y recuerda: planifica para el fracaso. Todos tropezamos ocasionalmente; lo que divide a las personas exitosas de los demás es que vuelven al sendero rápidamente."
+    },
+    {
+      "id": "action-3",
+      "type": "interactive_node",
+      "component": "NegativeDialogueReframer",
+      "title": "Paso 3: Reforma tu Diálogo",
+      "description": "Escribe el pensamiento negativo que sueles tener al fallar, y luego usa el poder del 'PERO' para reformularlo en un mensaje de crecimiento.",
+      "props": {
+        "action": "reframe_dialogue"
+      }
+    }
+  ]
+}

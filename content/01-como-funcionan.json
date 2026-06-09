@@ -1,0 +1,82 @@
+{
+  "module": 1,
+  "title": "¿Cómo Funcionan Los Hábitos?",
+  "sections": [
+    {
+      "id": "theory-1",
+      "type": "theory",
+      "title": "Las 3 R del Cambio de Hábitos",
+      "image": "/images/mod1_theory1_3rs_1780950191612.png",
+      "content": "Hay un patrón fácil de 3 pasos que sigue cada hábito[cite: 69]. Este patrón lo llaman las '3 R del cambio de hábitos' y es de esta forma [cite: 70]: Recordatorio (el disparador que inicia el comportamiento) [cite: 71], Rutina (el accionar en sí; la acción que realiza) [cite: 73] y Recompensa (el provecho que obtiene al hacer el comportamiento)[cite: 73]."
+    },
+    {
+      "id": "theory-2",
+      "type": "theory",
+      "title": "Ejemplo en la Vida Real",
+      "image": "/images/mod1_theory2_phone_1780950201297.png",
+      "content": "Paso uno: Su teléfono suena (recordatorio)[cite: 81]. Segundo paso: Contesta su teléfono (rutina)[cite: 84, 85]. Paso tres: Averigua quién llama (recompensa)[cite: 86]. Si la recompensa es efectiva, entonces se forma un período de 'reabastecimiento' efectivo que le dice a su cerebro: 'La próxima vez que ocurra este recordatorio, haz lo mismo'[cite: 89]."
+    },
+    {
+      "id": "action-1",
+      "type": "interactive_node",
+      "component": "HabitBuilder",
+      "title": "Paso 1: Selecciona tu Recordatorio",
+      "description": "Escriba dos listas[cite: 114]. En la lista principal, escriba las cosas que hace día tras día sin falta[cite: 115]. En la segunda lista, redacta las cosas que le suceden todos los días[cite: 128].",
+      "props": {
+        "action": "select_trigger",
+        "suggested_triggers_list_1": [
+          "Meterse a la ducha [cite: 117]", 
+          "Ponerse los zapatos [cite: 118]", 
+          "Cepillar sus dientes [cite: 119]", 
+          "Sentarse a cenar [cite: 123]", 
+          "Apagar las luces [cite: 124]", 
+          "Meterse en la cama [cite: 125]"
+        ],
+        "suggested_triggers_list_2": [
+          "Se detiene en un semáforo en rojo [cite: 129]", 
+          "Recibe un mensaje de texto [cite: 130]"
+        ]
+      }
+    },
+    {
+      "id": "theory-3",
+      "type": "theory",
+      "title": "Paso 2: Hazlo Espectacularmente Simple",
+      "image": "/images/mod1_theory3_simple_1780950211100.png",
+      "content": "Hágalo tan simple que no logre decir que no[cite: 146]. El cambio duradero es producto de los hábitos cotidianos, no de transformaciones únicas en la vida[cite: 159]. Empiece poco a poco[cite: 160]. Lo que importa es transformarse en el tipo de persona que siempre se apega a su nuevo hábito[cite: 164]."
+    },
+    {
+      "id": "action-2",
+      "type": "interactive_node",
+      "component": "HabitRoutineInput",
+      "title": "Define tu Nueva Rutina",
+      "description": "Elija un nuevo hábito que quiera empezar. En este momento pregúntese: '¿Cómo puedo lograr que este nuevo accionar sea tan simple de lograr que no logre decir que no?' [cite: 166]",
+      "props": {
+        "action": "input_routine"
+      }
+    },
+    {
+      "id": "theory-4",
+      "type": "theory",
+      "title": "Paso 3: Recompénsese Siempre",
+      "image": "/images/mod1_theory4_reward_1780950220517.png",
+      "content": "Tiene que festejar[cite: 168]. Deseamos continuar realizando cosas que nos hagan sentir bien[cite: 168]. Recompénsese con un diálogo positivo[cite: 174]. Diviértase con cada pequeño triunfo[cite: 176]."
+    },
+    {
+       "id": "action-3",
+       "type": "interactive_node",
+       "component": "HabitRewardInput",
+       "title": "Define tu Recompensa",
+       "description": "Asegúrese de que los hábitos que está intentando de desarrollar sean verdaderamente indispensables para usted[cite: 177]. Escriba la recompensa o frase positiva que usará al completar su nuevo hábito.",
+       "props": {
+         "action": "input_reward",
+         "suggested_rewards": [
+           "Fue un óptimo día [cite: 171]",
+           "Buen trabajo. Has progresado hoy [cite: 172]",
+           "¡Victoria! [cite: 172]",
+           "¡Éxito! [cite: 172]"
+         ]
+       }
+    }
+  ]
+}
