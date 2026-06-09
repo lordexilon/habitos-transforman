@@ -153,7 +153,7 @@ export default function CoachChat() {
       </div>
 
       {/* Messages List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24 scroll-smooth">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-36 scroll-smooth">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
             {msg.role === 'assistant' && (
@@ -200,7 +200,7 @@ export default function CoachChat() {
       </div>
 
       {/* Input Area */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white border-t p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+      <div className="absolute bottom-[64px] left-0 right-0 bg-white border-t p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40">
         <form onSubmit={handleSend} className="flex gap-2">
           <input
             type="text"

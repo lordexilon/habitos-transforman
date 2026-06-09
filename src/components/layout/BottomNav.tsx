@@ -16,8 +16,7 @@ const navItems = [
 export default function BottomNav() {
   const pathname = usePathname();
 
-  // Ocultar BottomNav en la vista inmersiva del chat
-  if (pathname === '/coach') return null;
+  // El usuario solicitó mantener el BottomNav visible en el chat
 
   return (
     <nav className="fixed bottom-0 left-auto right-auto w-full max-w-md z-50 bg-white/80 backdrop-blur-md border-t border-gray-200 pb-safe">
