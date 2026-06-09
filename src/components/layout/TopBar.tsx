@@ -18,7 +18,7 @@ export default function TopBar() {
   }, []);
 
   return (
-    <div className="fixed top-0 left-auto right-auto w-full max-w-md h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 z-50 shadow-sm">
+    <div className="fixed top-0 left-0 right-0 mx-auto w-full max-w-md h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 z-50 shadow-sm">
       <div className="font-extrabold text-gray-900 text-xl tracking-tight">SCA<span className="text-indigo-500">Hábitos</span></div>
       <div className="flex items-center gap-5 font-black text-lg">
         <div className="flex items-center gap-1.5 text-orange-500 bg-orange-50 px-3 py-1 rounded-full">
