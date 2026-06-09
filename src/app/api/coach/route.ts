@@ -41,38 +41,35 @@ Responde ÚNICAMENTE con un objeto JSON válido con estas claves (sin texto ante
 - "improvement": string con el consejo más crítico y específico para mejorar ESTE hábito concreto
 - "proposal": string con una reformulación poderosa y específica de ESTE hábito, usando los datos del usuario`;
 
-    // Configuración para Ollama local. 
-    const model = process.env.LOCAL_OLLAMA_MODEL || 'qwen3.5:latest'; 
+    const model = 'qwen-plus'; 
 
     try {
-      // AbortController para un timeout manual de 90s
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 90000);
       
-      const ollamaRes = await fetch('http://127.0.0.1:11434/api/chat', {
+      const apiRes = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.QWEN_API_KEY}`
+        },
         signal: controller.signal,
         body: JSON.stringify({
           model: model,
           messages: [{ role: 'user', content: prompt }],
           stream: false,
-          think: false,   // Deshabilita el modo "thinking" de Qwen3.5 - responde directo
-          options: {
-            num_predict: 300,
-            temperature: 0.3
-          }
+          temperature: 0.3
         })
       });
       clearTimeout(timeoutId);
 
-      if (!ollamaRes.ok) {
-        throw new Error(`Error de Ollama: ${ollamaRes.statusText}`);
+      if (!apiRes.ok) {
+        const errorText = await apiRes.text();
+        throw new Error(`Qwen API Error: ${apiRes.statusText} - ${errorText}`);
       }
 
-      const data = await ollamaRes.json();
-      // /api/chat devuelve data.message.content (no data.response como /api/generate)
-      let textResponse = data.message?.content || data.response || "{}";
+      const data = await apiRes.json();
+      let textResponse = data.choices?.[0]?.message?.content || "{}";
       
       // Log para debug - ver qué devuelve Qwen exactamente
       console.log("🤖 Respuesta cruda de Qwen:", textResponse.substring(0, 500));
