@@ -179,7 +179,7 @@ export default function CoachChat() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50 max-w-md mx-auto shadow-2xl overflow-hidden relative">
+    <div className="flex flex-col h-[calc(100vh-128px)] bg-gray-50 relative">
       {/* Top Bar */}
       <div className="bg-white border-b px-4 py-4 flex items-center justify-between z-10 shadow-sm">
         <button onClick={() => router.push('/')} className="p-2 -ml-2 rounded-full hover:bg-gray-100 text-gray-500">
@@ -202,7 +202,7 @@ export default function CoachChat() {
       </div>
 
       {/* Messages List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-36 scroll-smooth">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
         {messages.map((msg, i) => (
           <React.Fragment key={i}>
           <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
@@ -264,7 +264,7 @@ export default function CoachChat() {
       </div>
 
       {/* Input Area */}
-      <div className="absolute bottom-[64px] left-0 right-0 bg-white border-t p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40">
+      <div className="bg-white border-t p-4 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40 shrink-0">
         <form onSubmit={handleSend} className="flex gap-2 relative">
           <input
             type="text"
