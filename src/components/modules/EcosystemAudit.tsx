@@ -30,7 +30,7 @@ export default function EcosystemAudit({ title, description, ecosystemAreas, val
               {ecosystemAreas.map((item, idx) => {
                 const isSelected = value.includes(item);
                 return (
-                  <label key={idx} className="flex items-center gap-3 cursor-pointer">
+                  <label key={idx} className="flex items-center gap-3 cursor-pointer" onClick={() => toggleArea(item)}>
                     <div className={`w-6 h-6 rounded-md border flex items-center justify-center transition-colors ${
                       isSelected ? 'bg-teal-600 border-teal-600' : 'bg-white border-teal-300'
                     }`}>
