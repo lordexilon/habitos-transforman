@@ -103,7 +103,7 @@ export default function ErradicacionYReemplazo() {
         isSaving={isSaving}
         moduleImage="/images/erradicacion.png"
         moduleTitle={moduleData.title}
-        canComplete={Boolean(habitState.badHabit && habitState.substitute && habitState.reframedDialogue)}
+        canComplete={Boolean(habitState.cause && habitState.substitute && habitState.reframe)}
       >
         {moduleData.sections.map(renderSection)}
 
@@ -114,8 +114,8 @@ export default function ErradicacionYReemplazo() {
             <div className="flex items-start gap-4">
               <span className="bg-rose-100 text-rose-600 w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Hábito a Eliminar</p>
-                <p className="text-gray-800 font-medium text-lg line-through opacity-70">{habitState.badHabit || 'Falta definir'}</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Causa del Mal Hábito</p>
+                <p className="text-gray-800 font-medium text-lg line-through opacity-70">{habitState.cause || 'Falta definir'}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -129,7 +129,7 @@ export default function ErradicacionYReemplazo() {
               <span className="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center font-bold">3</span>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Nuevo Diálogo (Poder del "Pero")</p>
-                <p className="text-gray-800 font-medium text-lg">{habitState.reframedDialogue || 'Falta definir'}</p>
+                <p className="text-gray-800 font-medium text-lg">{habitState.reframe || 'Falta definir'}</p>
               </div>
             </div>
           </div>
