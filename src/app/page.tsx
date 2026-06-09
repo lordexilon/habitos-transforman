@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { Brain, Target, ShieldBan, HeartPulse } from "lucide-react";
+import { Brain, Target, ShieldBan, HeartPulse, ArrowRight } from "lucide-react";
+import Logo from "@/components/ui/Logo";
 
 export default function Home() {
   return (
     <div className="p-6 pb-20">
-      <header className="mb-8 mt-4">
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
-          Hábitos <span className="text-blue-600">Poderosos</span>
-        </h1>
-        <p className="text-gray-500 mt-2 text-sm">Metodología SCA para transformar tu vida.</p>
+      <header className="mb-10 mt-6 flex flex-col items-center text-center">
+        <Logo className="w-20 h-20 mb-4" showText={true} textClassName="text-4xl" />
+        <p className="text-gray-500 mt-3 text-base">La metodología definitiva para dominar tu mente y transformar tu vida.</p>
+        <Link href="/auth" className="mt-6 bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-indigo-200 flex items-center gap-2 hover:bg-indigo-700 transition-all active:scale-95">
+          Comenzar Ahora <ArrowRight className="w-5 h-5" />
+        </Link>
       </header>
 
       <section className="space-y-4">
