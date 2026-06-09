@@ -17,6 +17,7 @@ export default function CoachChat() {
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isGeneratingAgenda, setIsGeneratingAgenda] = useState(false);
   const [userHabits, setUserHabits] = useState<any[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -129,6 +130,30 @@ export default function CoachChat() {
     }
   };
 
+  const handleGenerateAgenda = async (text: string) => {
+    setIsGeneratingAgenda(true);
+    try {
+      const res = await fetch('/api/agenda/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ coachText: text })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        // Generar IDs para cada tarea
+        const agendaWithIds = data.agenda.map((t: any) => ({ ...t, id: Math.random().toString(36).substring(7), completed: false }));
+        localStorage.setItem('user_agenda', JSON.stringify(agendaWithIds));
+        // Reset pill
+        localStorage.removeItem('pill_read_today');
+        router.push('/agenda');
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsGeneratingAgenda(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-screen bg-gray-50 max-w-md mx-auto shadow-2xl overflow-hidden relative">
       {/* Top Bar */}
@@ -155,7 +180,8 @@ export default function CoachChat() {
       {/* Messages List */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-36 scroll-smooth">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+          <React.Fragment key={i}>
+          <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
             {msg.role === 'assistant' && (
               <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-2 shrink-0 self-end mb-1">
                 <Bot className="w-5 h-5 text-indigo-600" />
@@ -182,6 +208,20 @@ export default function CoachChat() {
               </div>
             )}
           </div>
+          
+          {msg.role === 'assistant' && i === messages.length - 1 && !isTyping && (
+             <div className="pl-10 flex justify-start">
+               <button 
+                 onClick={() => handleGenerateAgenda(msg.content)}
+                 disabled={isGeneratingAgenda}
+                 className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-emerald-600 shadow-md transition-all active:scale-95 disabled:opacity-70"
+               >
+                 {isGeneratingAgenda ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                 {isGeneratingAgenda ? 'Mapeando tu cerebro...' : 'Agregar esto a mi Agenda'}
+               </button>
+             </div>
+          )}
+          </React.Fragment>
         ))}
 
         {isTyping && (

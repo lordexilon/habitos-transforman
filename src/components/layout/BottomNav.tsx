@@ -2,15 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Brain, Target, ShieldBan, HeartPulse, Home, MessageCircleMore } from 'lucide-react';
+import { Brain, Target, ShieldBan, HeartPulse, Home, MessageCircleMore, CheckSquare, BookOpen } from 'lucide-react';
 
 const navItems = [
   { name: 'Inicio', href: '/', icon: Home },
-  { name: 'Ciencia', href: '/ciencia-del-habito', icon: Brain },
+  { name: 'Agenda', href: '/agenda', icon: CheckSquare },
+  { name: 'Libro', href: '/libro', icon: BookOpen },
   { name: 'Coach', href: '/coach', icon: MessageCircleMore },
   { name: 'Sistemas', href: '/sistemas-vs-metas', icon: Target },
-  { name: 'Erradicación', href: '/erradicacion-y-reemplazo', icon: ShieldBan },
-  { name: 'Ecosistema', href: '/ecosistema-vida-sana', icon: HeartPulse },
 ];
 
 export default function BottomNav() {
