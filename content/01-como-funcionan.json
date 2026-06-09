@@ -7,7 +7,7 @@
       "type": "theory",
       "title": "Las 3 R del Cambio de Hábitos",
       "image": "/images/mod1_theory1_3rs_1780950191612.png",
-      "content": "Hay un patrón fácil de 3 pasos que sigue cada hábito[cite: 69]. Este patrón lo llaman las '3 R del cambio de hábitos' y es de esta forma [cite: 70]: Recordatorio (el disparador que inicia el comportamiento) [cite: 71], Rutina (el accionar en sí; la acción que realiza) [cite: 73] y Recompensa (el provecho que obtiene al hacer el comportamiento)[cite: 73]."
+      "content": "Hay un patrón fácil de 3 pasos que sigue cada hábito[cite: 69].\n\nEste patrón lo llaman las **'3 R del cambio de hábitos'** y funciona de la siguiente manera:\n\n**1. Recordatorio**: El disparador o señal que inicia el comportamiento[cite: 71].\n\n**2. Rutina**: El accionar en sí, es decir, la acción física o mental que realizas[cite: 73].\n\n**3. Recompensa**: El beneficio o provecho que obtiene tu cerebro, fijando el hábito[cite: 73]."
     },
     {
       "id": "theory-2",
@@ -77,6 +77,14 @@
            "¡Éxito! [cite: 172]"
          ]
        }
+    },
+    {
+       "id": "theory-pro-1",
+       "type": "theory",
+       "title": "💡 Nivel Avanzado: La Regla de los 2 Minutos",
+       "image": "/images/mod1_theory4_reward_1780950220517.png",
+       "content": "Si tu nuevo hábito toma menos de dos minutos en realizarse, hazlo inmediatamente. Al empezar con un hábito de 2 minutos, es sumamente simple establecer una inercia positiva antes de incrementar la dificultad. La constancia es lo primero, la optimización viene después.",
+       "minPoints": 100
     }
   ]
 }

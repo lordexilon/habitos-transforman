@@ -48,6 +48,14 @@
           "15 minutos de limpieza en equipo diaria"
         ]
       }
+    },
+    {
+      "id": "theory-pro-4",
+      "type": "theory",
+      "title": "💡 Nivel Avanzado: El Diseño del Entorno",
+      "image": "/images/mod4_theory1_health_1780950294412.png",
+      "content": "Las personas con mayor autocontrol no son las que tienen una fuerza de voluntad de acero, sino las que diseñan su entorno para evitar tentaciones. No pongas chocolates en la mesa si quieres comer sano. Diseña tu entorno para que el buen hábito sea obvio y el malo sea invisible.",
+      "minPoints": 250
     }
   ]
 }

@@ -64,6 +64,14 @@
       "props": {
         "action": "reframe_dialogue"
       }
+    },
+    {
+      "id": "theory-pro-3",
+      "type": "theory",
+      "title": "💡 Nivel Avanzado: La Ley del Menor Esfuerzo",
+      "image": "/images/mod3_theory1_stress_1780950261409.png",
+      "content": "Para erradicar un mal hábito definitivamente, aumenta la fricción. Si quieres ver menos televisión, desenchúfala y saca las pilas del control remoto tras cada uso. Hacer que el mal hábito requiera un esfuerzo consciente rompe el automatismo cerebral.",
+      "minPoints": 200
     }
   ]
 }

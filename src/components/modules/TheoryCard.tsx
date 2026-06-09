@@ -13,10 +13,27 @@ interface TheoryCardProps {
 const cleanText = (text: string) =>
   text.replace(/\[cite:\s*\d+\]/g, '').replace(/\s{2,}/g, ' ').trim();
 
+// Formatea texto con negritas simples (**texto**) a JSX
+const formatRichText = (text: string) => {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={index} className="font-extrabold text-indigo-950">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+};
+
 export default function TheoryCard({ title, content, image }: TheoryCardProps) {
-  // Dividir en oraciones y limpiar citas académicas
-  const rawChunks = content.match(/[^\.!\?]+[\.!\?]+/g) || [content];
-  const chunks = rawChunks.map(cleanCitations).filter(c => c.length > 3);
+  // Dividir por párrafos (saltos de línea dobles). Si no los hay, por oraciones.
+  const rawChunks = content.includes('\n\n') 
+    ? content.split(/\n\n+/) 
+    : (content.match(/[^\.!\?]+[\.!\?]+/g) || [content]);
+  const chunks = rawChunks.map(cleanCitations).filter(c => c.trim().length > 3);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const isFirst = currentIndex === 0;
@@ -48,15 +65,21 @@ export default function TheoryCard({ title, content, image }: TheoryCardProps) {
 
       {/* Contenido — solo esta zona avanza al siguiente al hacer tap */}
       <div
-        className="min-h-[180px] flex items-center justify-center gap-5 text-left px-6 py-6 cursor-pointer select-none active:scale-[0.99] transition-transform"
+        className="min-h-[220px] flex flex-col items-center justify-center gap-4 text-center px-6 py-8 cursor-pointer select-none active:scale-[0.99] transition-transform"
         onClick={handleNext}
       >
         {image && (
-          <img src={image} alt={title} className="w-20 h-20 rounded-2xl object-cover shrink-0 shadow-sm border border-gray-100 bg-gray-50 animate-fade-in" />
+          <div className="w-24 h-24 shrink-0 relative animate-fade-in mb-1">
+            <img 
+              src={image} 
+              alt={title} 
+              className="w-full h-full rounded-2xl object-cover shadow-md border border-gray-100 bg-gray-50" 
+            />
+          </div>
         )}
-        <p className={`text-gray-800 font-semibold leading-relaxed ${image ? 'text-lg' : 'text-xl text-center'}`}>
-          {chunks[currentIndex]}
-        </p>
+        <div className="text-gray-800 font-semibold leading-relaxed text-base md:text-lg max-w-sm whitespace-pre-line">
+          {formatRichText(chunks[currentIndex])}
+        </div>
       </div>
 
       {/* Navegación — stopPropagation para no activar el onClick del contenedor */}

@@ -4,7 +4,10 @@
  */
 export function cleanCitations(text: string): string {
   return text
-    .replace(/\[cite:\s*\d+\]/gi, '')
-    .replace(/\s{2,}/g, ' ')
+    .replace(/\[cite:\s*\d+(?:\s*,\s*\d+)*\]/gi, '') // Limpia citas simples y múltiples (ej: [cite: 84, 85])
+    .replace(/\s+([,.:;?!])/g, '$1')                 // Elimina espacios antes de signos de puntuación
+    .replace(/\(\s+/g, '(')                          // Elimina espacio después de abrir paréntesis
+    .replace(/\s+\)/g, ')')                          // Elimina espacio antes de cerrar paréntesis
+    .replace(/\s{2,}/g, ' ')                         // Normaliza espacios múltiples
     .trim();
 }

@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 interface ModuleWizardProps {
   children: React.ReactNode;
@@ -11,6 +12,14 @@ interface ModuleWizardProps {
 }
 
 export default function ModuleWizard({ children, onComplete, isSaving, moduleImage, moduleTitle, canComplete = true }: ModuleWizardProps) {
+  const { session } = useAuth();
+  const userId = session?.user?.id || 'guest';
+  const [points, setPoints] = useState(0);
+
+  useEffect(() => {
+    setPoints(Number(localStorage.getItem(`user_points_${userId}`) || '0'));
+  }, [userId]);
+
   const steps = React.Children.toArray(children).filter(child => React.isValidElement(child));
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -50,12 +59,24 @@ export default function ModuleWizard({ children, onComplete, isSaving, moduleIma
           </h2>
         </div>
         
+        {/* Nivel de Contenido */}
+        <div className="px-6 pb-2 pt-3 flex items-center justify-between border-b border-gray-50">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
+              {points >= 200 ? '🌟 Contenido Avanzado' : points >= 100 ? '✨ Contenido Intermedio' : '🌱 Contenido Básico'}
+            </span>
+          </div>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+            Nivel actual: {points >= 200 ? '3 (Avanzado)' : points >= 100 ? '2 (Intermedio)' : '1 (Principiante)'}
+          </span>
+        </div>
+
         {/* Progress Bar */}
-        <div className="px-6 py-5 flex items-center gap-4">
-          <div className="text-sm font-bold text-gray-500 whitespace-nowrap uppercase tracking-wider">
+        <div className="px-6 py-4 flex items-center gap-4">
+          <div className="text-xs font-bold text-gray-500 whitespace-nowrap uppercase tracking-wider">
             Paso {currentStep + 1} de {steps.length}
           </div>
-          <div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
             <div 
               className="h-full bg-indigo-500 transition-all duration-500 ease-out rounded-full shadow-sm"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}

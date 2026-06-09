@@ -11,12 +11,14 @@ type Message = {
   content: string;
 };
 
+const INITIAL_MESSAGE: Message[] = [
+  { role: 'assistant', content: '¡Hola! Soy tu Coach de SCAHábitos. ¿Cómo va tu progreso hoy? Si tuviste algún problema con tus rutinas o tienes dudas sobre la ciencia de los hábitos, cuéntamelo y lo resolvemos.' }
+];
+
 export default function CoachChat() {
   const router = useRouter();
   const supabase = createClient();
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: '¡Hola! Soy tu Coach de SCAHábitos. ¿Cómo va tu progreso hoy? Si tuviste algún problema con tus rutinas o tienes dudas sobre la ciencia de los hábitos, cuéntamelo y lo resolvemos.' }
-  ]);
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGE);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isGeneratingAgenda, setIsGeneratingAgenda] = useState(false);
@@ -35,9 +37,21 @@ export default function CoachChat() {
   // Cargar contexto del usuario (sus hábitos guardados en BD)
   useEffect(() => {
     async function loadHabits() {
-      const { data } = await supabase.from('user_habits').select('*').order('created_at', { ascending: false }).limit(5);
+      if (!session?.user?.id) {
+        setUserHabits([]);
+        return;
+      }
+      const { data } = await supabase
+        .from('user_habits')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
       if (data && data.length > 0) {
         setUserHabits(data.map(d => d.habit_data));
+      } else {
+        setUserHabits([]);
       }
     }
     loadHabits();
@@ -47,6 +61,8 @@ export default function CoachChat() {
     const saved = localStorage.getItem(`chat_history_${userId}`);
     if (saved) {
       try { setMessages(JSON.parse(saved)); } catch (e) {}
+    } else {
+      setMessages(INITIAL_MESSAGE);
     }
   }, [session]);
 

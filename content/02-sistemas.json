@@ -54,6 +54,14 @@
       "title": "La Acción Triple y Prioridades",
       "image": "/images/mod2_theory3_triple_1780950251110.png",
       "content": "La acción exitosa es triple: Mental (ver y creer), Elaboración (estudiar y entrenar) y Física (trabajar directamente). Además, dado que el tiempo es limitado, divide tu enorme lista en solo 4 objetivos fundamentales para no abrumarte. El orden, la limpieza y encontrar cooperación recíproca (ganar-ganar) son esenciales para progresar."
+    },
+    {
+      "id": "theory-pro-2",
+      "type": "theory",
+      "title": "💡 Nivel Avanzado: El Efecto Dominó",
+      "image": "/images/mod2_theory2_keystone_1780950240478.png",
+      "content": "El cambio de un hábito clave produce un 'Efecto Dominó' que reestructura otras rutinas cotidianas sin esfuerzo consciente. Por ejemplo, al ordenar tu cama todas las mañanas, tu cerebro asume una identidad de orden y disciplina que se traslada a tus hábitos de alimentación y trabajo.",
+      "minPoints": 150
     }
   ]
 }
