@@ -89,7 +89,7 @@ export default function EcosistemaVidaSana() {
         isSaving={isSaving}
         moduleImage="/images/ecosistema.png"
         moduleTitle={moduleData.title}
-        canComplete={Boolean(habitState.weakestPillar && habitState.familyChallenge)}
+        canComplete={Boolean(habitState.auditAreas.length > 0 && habitState.challenge)}
       >
         {moduleData.sections.map(renderSection)}
 
@@ -100,15 +100,15 @@ export default function EcosistemaVidaSana() {
             <div className="flex items-start gap-4">
               <span className="bg-yellow-100 text-yellow-600 w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Pilar a Mejorar</p>
-                <p className="text-gray-800 font-medium text-lg">{habitState.weakestPillar || 'Falta definir'}</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Áreas de Auditoría</p>
+                <p className="text-gray-800 font-medium text-lg">{habitState.auditAreas.join(', ') || 'Falta definir'}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
               <span className="bg-indigo-100 text-indigo-600 w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span>
               <div>
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Reto Familiar</p>
-                <p className="text-gray-800 font-medium text-lg">{habitState.familyChallenge || 'Falta definir'}</p>
+                <p className="text-gray-800 font-medium text-lg">{habitState.challenge || 'Falta definir'}</p>
               </div>
             </div>
           </div>
