@@ -1,11 +1,12 @@
 {
-  "name": "Hábitos Poderosos",
+  "name": "SCA Hábitos",
   "short_name": "Hábitos",
-  "description": "App para consumo dinámico de contenido del libro Hábitos Poderosos",
+  "description": "Transforma tu vida con la ciencia del hábito.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/icon-192x192.png",
