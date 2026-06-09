@@ -49,11 +49,14 @@ REGLAS:
 5. REGLA DE ORO: Responde SIEMPRE y ÚNICAMENTE en Español. NO uses inglés bajo ninguna circunstancia.
 6. CRÍTICO: NO generes monólogos internos, borradores o pensamientos. NO uses formato "User Input:" o "Internal Monologue". Escribe directamente tu mensaje final para el usuario.`;
 
-    const model = process.env.LOCAL_OLLAMA_MODEL || 'qwen3.5:latest';
+    const model = 'qwen-plus'; // Usamos qwen-plus que es la versión optimizada
 
-    const ollamaResponse = await fetch('http://127.0.0.1:11434/api/chat', {
+    const apiResponse = await fetch('https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.QWEN_API_KEY}`
+      },
       body: JSON.stringify({
         model: model,
         messages: [
@@ -61,20 +64,21 @@ REGLAS:
           ...messages
         ],
         stream: true,
-        options: {
-          temperature: 0.5 // Creativo pero apegado al contexto
-        }
+        temperature: 0.5
       })
     });
 
-    if (!ollamaResponse.ok) {
-      throw new Error(`Ollama Error: ${ollamaResponse.statusText}`);
+    if (!apiResponse.ok) {
+      const err = await apiResponse.text();
+      throw new Error(`Qwen API Error: ${apiResponse.statusText} - ${err}`);
     }
 
-    // Retornamos el stream directamente al cliente
-    return new Response(ollamaResponse.body, {
+    // Retornamos el stream directamente al cliente (Server-Sent Events)
+    return new Response(apiResponse.body, {
       headers: {
-        'Content-Type': 'application/x-ndjson',
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
       }
     });
 

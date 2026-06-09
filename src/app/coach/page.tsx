@@ -98,21 +98,26 @@ export default function CoachChat() {
           const lines = chunk.split('\n').filter(l => l.trim() !== '');
           
           for (const line of lines) {
-            try {
-              const data = JSON.parse(line);
-              if (data.message && data.message.content) {
-                currentMessageContent += data.message.content;
-                setMessages(prev => {
-                  const newMsgs = [...prev];
-                  newMsgs[newMsgs.length - 1] = { 
-                    ...newMsgs[newMsgs.length - 1], 
-                    content: currentMessageContent 
-                  };
-                  return newMsgs;
-                });
+            if (line.startsWith('data: ')) {
+              const dataStr = line.replace('data: ', '').trim();
+              if (dataStr === '[DONE]') continue;
+              
+              try {
+                const data = JSON.parse(dataStr);
+                if (data.choices && data.choices[0]?.delta?.content) {
+                  currentMessageContent += data.choices[0].delta.content;
+                  setMessages(prev => {
+                    const newMsgs = [...prev];
+                    newMsgs[newMsgs.length - 1] = { 
+                      ...newMsgs[newMsgs.length - 1], 
+                      content: currentMessageContent 
+                    };
+                    return newMsgs;
+                  });
+                }
+              } catch (e) {
+                // Ignore partial JSON chunks
               }
-            } catch (e) {
-              // Ignore partial JSON chunks
             }
           }
         }
