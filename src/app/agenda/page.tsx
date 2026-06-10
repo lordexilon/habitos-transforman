@@ -480,41 +480,135 @@ export default function AgendaPage() {
               <Trophy className="w-3.5 h-3.5 text-amber-500" /> Reto de la Semana
             </h2>
             <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-              <div className="flex justify-between items-start gap-4">
+
+              {/* Header del reto */}
+              <div className="flex justify-between items-start gap-3 mb-4">
                 <div className="flex-1">
-                  <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                    Desafío Activo
+                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                    weeklyEvaluated
+                      ? 'text-emerald-600 bg-emerald-50'
+                      : 'text-indigo-600 bg-indigo-50'
+                  }`}>
+                    {weeklyEvaluated ? '✓ Completado' : 'Desafío Activo'}
                   </span>
                   <h3 className="font-black text-gray-900 text-base mt-2 leading-tight">{currentChallenge.title}</h3>
                   <p className="text-gray-500 text-sm font-medium mt-1 leading-snug">{currentChallenge.description}</p>
                 </div>
-                <div className="bg-amber-50 text-amber-600 w-12 h-12 rounded-2xl flex flex-col items-center justify-center font-bold text-xs shrink-0 border border-amber-100">
-                  <span className="text-base font-black">+{currentChallenge.points}</span>
-                  <span className="text-[8px] font-black tracking-wider uppercase leading-none">XP</span>
+                <div className="bg-amber-50 text-amber-600 w-14 h-14 rounded-2xl flex flex-col items-center justify-center font-bold shrink-0 border border-amber-100">
+                  <span className="text-lg font-black leading-none">+{currentChallenge.points}</span>
+                  <span className="text-[8px] font-black tracking-wider uppercase leading-none mt-0.5">XP</span>
                 </div>
               </div>
-              {isEvaluationTime && !weeklyEvaluated && (
-                <div className="mt-4 pt-3 border-t border-dashed border-indigo-100 flex flex-col gap-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-indigo-600">
-                    <Sparkles className="w-4 h-4 text-orange-400 animate-pulse" />
-                    ¡Tu Evaluación Semanal está disponible!
-                  </div>
-                  <button
-                    onClick={() => setShowWeeklyModal(true)}
-                    className="w-full bg-indigo-600 text-white font-bold py-2.5 rounded-xl text-sm shadow-md hover:bg-indigo-700 active:scale-95 transition-all"
-                  >
-                    Iniciar Evaluación del Coach
-                  </button>
-                </div>
-              )}
+
+              {!weeklyEvaluated && (() => {
+                // Progreso: días completados esta semana (tareas completadas / 7)
+                const now = new Date();
+                const dayOfWeek = now.getDay(); // 0=Dom
+                // Días desde el lunes (0=Lun ... 6=Dom)
+                const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                const daysInWeek = 7;
+                // Días que faltan hasta el próximo viernes 8pm (evaluación)
+                const daysToFriday = dayOfWeek <= 5
+                  ? 5 - dayOfWeek
+                  : 6; // domingo -> próximo viernes
+
+                const weekProgress = Math.round((daysSinceMonday / 6) * 100);
+
+                return (
+                  <>
+                    {/* Barra de progreso de la semana */}
+                    <div className="mb-4">
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-xs font-bold text-gray-500">Progreso de la semana</span>
+                        <span className="text-xs font-black text-indigo-600">{weekProgress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-700"
+                          style={{
+                            width: `${weekProgress}%`,
+                            background: 'linear-gradient(90deg, #6366f1, #8b5cf6)'
+                          }}
+                        />
+                      </div>
+                      <div className="flex justify-between mt-1">
+                        {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((d, i) => (
+                          <span
+                            key={i}
+                            className={`text-[9px] font-black w-5 text-center ${
+                              i < daysSinceMonday
+                                ? 'text-indigo-500'
+                                : i === daysSinceMonday
+                                ? 'text-indigo-700'
+                                : 'text-gray-300'
+                            }`}
+                          >
+                            {d}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Separador */}
+                    <div className="border-t border-dashed border-gray-100 pt-3">
+                      {isEvaluationTime ? (
+                        /* Es momento de evaluar */
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center gap-2 text-xs font-bold text-indigo-600">
+                            <Sparkles className="w-4 h-4 text-orange-400 animate-pulse" />
+                            ¡Es momento de tu Evaluación Semanal!
+                          </div>
+                          <button
+                            onClick={() => setShowWeeklyModal(true)}
+                            className="w-full text-white font-bold py-3 rounded-xl text-sm shadow-md active:scale-95 transition-all"
+                            style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' }}
+                          >
+                            🏆 Iniciar Evaluación del Coach
+                          </button>
+                        </div>
+                      ) : (
+                        /* Todavía en curso: mostrar countdown y botón de check-in */
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-indigo-50 rounded-xl flex items-center justify-center">
+                              <span className="text-base">📅</span>
+                            </div>
+                            <div>
+                              <p className="text-xs font-black text-gray-700">
+                                {daysToFriday === 0
+                                  ? 'Evaluación hoy a las 8 PM'
+                                  : `Evaluación en ${daysToFriday} día${daysToFriday !== 1 ? 's' : ''}`}
+                              </p>
+                              <p className="text-[10px] text-gray-400 font-medium">Sigue cumpliendo el reto cada día</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              if (!session) { setShowPaywall(true); return; }
+                              triggerToast('success', `¡Check-in del reto "${currentChallenge.title}" registrado! +5 XP 🔥`);
+                              addXP(5);
+                            }}
+                            className="shrink-0 bg-indigo-50 text-indigo-600 font-black text-xs px-3 py-2 rounded-xl border border-indigo-100 hover:bg-indigo-100 active:scale-95 transition-all"
+                          >
+                            ✓ Check-in
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                );
+              })()}
+
               {weeklyEvaluated && (
-                <div className="mt-3 pt-3 border-t border-gray-100 text-xs font-bold text-emerald-600 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Reto completado y evaluado. ¡Gran trabajo! 🏆
+                <div className="flex items-center gap-2 text-sm font-bold text-emerald-600 bg-emerald-50 rounded-xl px-3 py-2.5">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  ¡Reto completado y evaluado esta semana! 🏆
                 </div>
               )}
             </div>
           </section>
         )}
+
 
         {/* ── Task Timeline ── */}
         <section>

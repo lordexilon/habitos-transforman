@@ -48,12 +48,18 @@ export async function POST(req: Request) {
   }
 }
 
-// Retornar la llave pública VAPID actual para que el frontend pueda encriptar la suscripción
+// Retornar la llave pública VAPID para que el frontend encripte la suscripción
+// Leemos directamente del env para evitar problemas con require() en Vercel serverless
 export async function GET() {
-  try {
-    const { vapidKeys } = require('@/lib/webPush');
-    return NextResponse.json({ publicKey: vapidKeys.publicKey });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
+
+  if (!publicKey) {
+    console.error('❌ NEXT_PUBLIC_VAPID_PUBLIC_KEY no está configurada en las variables de entorno.');
+    return NextResponse.json(
+      { error: 'VAPID public key not configured on server.' },
+      { status: 503 }
+    );
   }
+
+  return NextResponse.json({ publicKey });
 }
