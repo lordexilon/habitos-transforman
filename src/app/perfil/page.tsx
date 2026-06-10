@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
-import { LogOut, User as UserIcon, Flame, Star, Loader2, Bell, BellOff } from 'lucide-react';
+import { LogOut, User as UserIcon, Flame, Star, Loader2, Bell, BellOff, AlertCircle } from 'lucide-react';
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -21,10 +21,11 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export default function ProfilePage() {
-  const { user, session, signOut, loading } = useAuth();
+  const { user, session, signOut, loading, swRegistration } = useAuth();
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [localPoints, setLocalPoints] = useState('0');
+  const [vapidError, setVapidError] = useState(false);
   const [localStreak, setLocalStreak] = useState('0');
   
   // Push Notification States
@@ -61,29 +62,36 @@ export default function ProfilePage() {
     }
 
     setIsPushLoading(true);
+    setVapidError(false);
     try {
-      const registration = await navigator.serviceWorker.ready;
-      
+      // Usar el registro del SW ya disponible desde AuthProvider (evita cuelgues de serviceWorker.ready)
+      const registration = swRegistration || await navigator.serviceWorker.ready;
+
       if (pushEnabled) {
         // Desactivar
         const subscription = await registration.pushManager.getSubscription();
-        if (subscription) {
-          await subscription.unsubscribe();
-        }
+        if (subscription) await subscription.unsubscribe();
         setPushEnabled(false);
       } else {
-        // Activar
+        // Activar: pedir permiso primero
         const permission = await Notification.requestPermission();
         if (permission !== 'granted') {
-          alert('Permiso de notificaciones denegado. Habilita los permisos en la configuración de tu navegador.');
+          alert('Permiso denegado. Habilita las notificaciones en la configuración de tu navegador.');
           setIsPushLoading(false);
           return;
         }
 
-        // Obtener la clave pública del backend
+        // Obtener la clave pública VAPID del backend
         const res = await fetch('/api/push/subscribe');
-        if (!res.ok) throw new Error("No se pudo obtener la llave pública VAPID");
-        const { publicKey } = await res.json();
+        if (!res.ok) throw new Error('No se pudo obtener la llave pública VAPID del servidor.');
+        const { publicKey, error: vapidErr } = await res.json();
+
+        // Validar que las keys VAPID estén configuradas en el servidor
+        if (!publicKey || publicKey.length < 10) {
+          setVapidError(true);
+          setIsPushLoading(false);
+          return;
+        }
 
         const convertedKey = urlBase64ToUint8Array(publicKey);
         const newSubscription = await registration.pushManager.subscribe({
@@ -91,22 +99,21 @@ export default function ProfilePage() {
           applicationServerKey: convertedKey
         });
 
-        // Registrar en base de datos
+        // Registrar suscripción en base de datos
         const saveRes = await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ subscription: newSubscription })
         });
+        if (!saveRes.ok) throw new Error('Fallo al registrar la suscripción en el servidor.');
 
-        if (!saveRes.ok) throw new Error("Fallo al registrar la suscripción en el servidor");
-
-        // Enviar notificación de bienvenida
+        // Enviar notificación de bienvenida de prueba
         await fetch('/api/push/send', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            title: "¡Notificaciones Activas! 🔔",
-            body: "Tu Coach te enviará recordatorios diarios de tus hábitos.",
+            title: '¡Notificaciones Activas! 🔔',
+            body: 'Tu Coach te enviará recordatorios diarios de tus hábitos.',
             userId: session?.user?.id || null
           })
         });
@@ -114,8 +121,8 @@ export default function ProfilePage() {
         setPushEnabled(true);
       }
     } catch (e: any) {
-      console.error("Error toggling push:", e);
-      alert('Error: ' + e.message);
+      console.error('Error toggling push:', e);
+      alert('Error al configurar notificaciones: ' + e.message);
     } finally {
       setIsPushLoading(false);
     }
@@ -181,12 +188,26 @@ export default function ProfilePage() {
         <p className="text-gray-500 text-xs font-semibold mb-4 leading-relaxed">
           Recibe recordatorios diarios para tus hábitos de la agenda y alertas de retrospectivas los viernes por la noche.
         </p>
+
+        {/* Alerta cuando VAPID no está configurado en el servidor */}
+        {vapidError && (
+          <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4">
+            <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-amber-700 text-xs font-bold">Configuración pendiente</p>
+              <p className="text-amber-600 text-xs mt-0.5 leading-relaxed">
+                Las variables <code className="bg-amber-100 px-1 rounded">NEXT_PUBLIC_VAPID_PUBLIC_KEY</code> y <code className="bg-amber-100 px-1 rounded">VAPID_PRIVATE_KEY</code> deben estar configuradas en Vercel para activar las notificaciones push.
+              </p>
+            </div>
+          </div>
+        )}
+
         <button
           onClick={togglePushNotifications}
           disabled={isPushLoading}
           className={`w-full flex items-center justify-center gap-2 font-bold py-3.5 rounded-xl transition-all active:scale-95 disabled:opacity-50 text-sm shadow-sm ${
-            pushEnabled 
-              ? 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-100' 
+            pushEnabled
+              ? 'bg-red-50 hover:bg-red-100 text-red-600 border border-red-100'
               : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-md'
           }`}
         >
