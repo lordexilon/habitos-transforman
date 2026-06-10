@@ -251,13 +251,26 @@ export default function CoachChat() {
         const tzoffset = (new Date()).getTimezoneOffset() * 60000;
         const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
         
-        const agendaWithIds = data.agenda.map((t: any) => ({
-          ...t,
-          id: Math.random().toString(36).substring(7),
-          event_date: localISOTime,
-          is_completed: false,
-          recurrence: 'none'
-        }));
+        const agendaWithIds = data.agenda.map((t: any) => {
+          let sTime = '09:00';
+          if (t.start_time) sTime = t.start_time;
+          else if (t.time) {
+            const timeStr = t.time.toLowerCase();
+            if (timeStr.includes('mañana')) sTime = '08:00';
+            else if (timeStr.includes('tarde')) sTime = '14:00';
+            else if (timeStr.includes('noche')) sTime = '20:00';
+          }
+
+          return {
+            ...t,
+            id: Math.random().toString(36).substring(7),
+            task_text: t.task_text || t.task || 'Hábito sugerido',
+            event_date: localISOTime,
+            start_time: sTime,
+            is_completed: false,
+            recurrence: 'none'
+          };
+        });
 
         if (session?.user?.id) {
           // Usuario autenticado: Insertar en Supabase
@@ -265,7 +278,7 @@ export default function CoachChat() {
             user_id: session.user.id,
             task_text: t.task_text,
             event_date: t.event_date,
-            start_time: t.start_time || '09:00',
+            start_time: t.start_time,
             end_time: null,
             is_all_day: t.is_all_day || false,
             category: t.category || 'habito',
