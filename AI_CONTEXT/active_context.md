@@ -1,12 +1,12 @@
 # Contexto Activo - Hábitos Transforman (SCA v3.0)
 
-**Estado Actual**: Optimización de Módulos, Carga de Invitados, Caché Semanal y Despliegue en Vercel totalmente completados y estables.
+**Estado Actual**: Daily Coach View implementado. Sistema de notificaciones Push corregido. Deploy en Vercel en progreso.
 **Última Acción**: 
-- Implementación de pre-generación paralela de los 4 módulos de hábitos al ingresar por primera vez o al cambiar de nivel, almacenados en `user_custom_modules`.
-- Configuración de importación estática de JSONs para evadir lecturas de archivos con `fs` en producción (resolución de error de compilación/ NFT bundler en Vercel).
-- Trigger automático silencioso para regeneración de la semana al evaluar retrospectivas y reclamar XP en el `WeeklyEvaluationModal`.
-- Vinculación correcta del `user_id` al insertar en `user_habits` para que el Coach de IA pueda ver el historial del usuario.
+- **Agenda rediseñada** como "Daily Coach View": strip semanal de 7 días con dots de actividad, navegación entre semanas, timeline de tareas con hora/categoría/XP/recurrencia, modal Quick Add, persistencia Supabase (auth) + localStorage (guest). Píldora diaria y Reto Semanal preservados en vista de Hoy.
+- **Fix Push Notifications (3 bugs)**: (1) Registro del SW ahora ocurre en `AuthProvider` al montar, exponiendo `swRegistration` por contexto para evitar timeouts en `serviceWorker.ready`. (2) Validación de keys VAPID con alerta visual en `perfil/page.tsx` cuando no están configuradas en Vercel. (3) Nuevo endpoint `/api/push/schedule` + `vercel.json` con cron "0 12 * * *" (9AM ART) para notificaciones diarias automáticas.
+- **DB**: Migración `00008_upgrade_agenda.sql` creada (requiere ejecución manual en Supabase SQL Editor — no ejecutada via CLI por falta de `supabase link`).
 
 **Siguientes Pasos Recomendados**:
-- Implementar notificaciones Push basadas en Service Worker (VAPID) en producción una vez configuradas las variables de entorno correspondientes.
-- Refinar las respuestas del Coach de IA basándose en los hábitos recién guardados y consolidados.
+- Ejecutar migración `00008_upgrade_agenda.sql` en el SQL Editor de Supabase.
+- Agregar variables de entorno en Vercel: `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `CRON_SECRET`.
+- Fase 2 de Agenda: integración Google Calendar (puente de datos ya compatible con GCal API v3).
