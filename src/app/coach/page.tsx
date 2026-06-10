@@ -246,18 +246,52 @@ export default function CoachChat() {
       });
       if (res.ok) {
         const data = await res.json();
-        const userId = session?.user?.id || 'guest';
+        
+        // Obtener la fecha de hoy en formato local (YYYY-MM-DD)
+        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
+        
         const agendaWithIds = data.agenda.map((t: any) => ({
-          ...t, id: Math.random().toString(36).substring(7), completed: false,
+          ...t,
+          id: Math.random().toString(36).substring(7),
+          event_date: localISOTime,
+          is_completed: false,
+          recurrence: 'none'
         }));
-        localStorage.setItem(`user_agenda_${userId}`, JSON.stringify(agendaWithIds));
+
+        if (session?.user?.id) {
+          // Usuario autenticado: Insertar en Supabase
+          const insertData = agendaWithIds.map((t: any) => ({
+            user_id: session.user.id,
+            task_text: t.task_text,
+            event_date: t.event_date,
+            start_time: t.start_time || '09:00',
+            end_time: null,
+            is_all_day: t.is_all_day || false,
+            category: t.category || 'habito',
+            color: t.color || 'indigo',
+            xp_reward: t.xp_reward || 10,
+            recurrence: t.recurrence,
+            is_completed: false
+          }));
+          const { error } = await supabase.from('user_agenda').insert(insertData);
+          if (error) console.error('Error insertando en Supabase:', error);
+        } else {
+          // Guest: Insertar en el nuevo formato guest_agenda_YYYY-MM-DD
+          const key = `guest_agenda_${localISOTime}`;
+          const existing = JSON.parse(localStorage.getItem(key) || '[]');
+          localStorage.setItem(key, JSON.stringify([...existing, ...agendaWithIds]));
+        }
+
         setMessages(prev => [
           ...prev,
           { role: 'assistant', content: `¡Listo! Agregué **${data.agenda.length} tareas** a tu agenda de hoy. 🎯` },
         ]);
         router.push('/agenda');
       }
-    } catch { console.error('agenda error'); }
+    } catch (e) { 
+      console.error('agenda error', e); 
+    }
     finally { setIsGeneratingAgenda(false); }
   };
 
