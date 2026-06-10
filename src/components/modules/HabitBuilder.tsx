@@ -17,8 +17,8 @@ export default function HabitBuilder({ title, description, suggestedList1, sugge
 
   return (
     <div className="bg-blue-50 p-6 rounded-2xl border border-blue-200 mb-6">
-      <h3 className="text-lg font-bold text-blue-900 mb-2">{title}</h3>
-      <p className="text-blue-800 text-sm mb-4">{description.replace(/\[cite:\s*\d+\]/g, '')}</p>
+      <h3 className="text-lg font-bold text-blue-900 mb-2">{cleanCitations(title)}</h3>
+      <p className="text-blue-800 text-sm mb-4">{cleanCitations(description)}</p>
       
       <div className="space-y-4">
         {suggestedList1 && suggestedList1.length > 0 && (

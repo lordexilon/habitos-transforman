@@ -3,6 +3,7 @@
  * Debe usarse en cualquier componente que renderice contenido proveniente de los JSON de contenido.
  */
 export function cleanCitations(text: string): string {
+  if (!text || typeof text !== 'string') return '';
   return text
     .replace(/\[cite:\s*\d+(?:\s*,\s*\d+)*\]/gi, '') // Limpia citas simples y múltiples (ej: [cite: 84, 85])
     .replace(/\s+([,.:;?!])/g, '$1')                 // Elimina espacios antes de signos de puntuación

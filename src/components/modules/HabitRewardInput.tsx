@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { cleanCitations } from '@/lib/cleanCitations';
 
 interface HabitRewardInputProps {
   title: string;
@@ -11,12 +12,12 @@ interface HabitRewardInputProps {
 export default function HabitRewardInput({ title, description, suggestedRewards, value, onChange }: HabitRewardInputProps) {
   const [customInput, setCustomInput] = useState('');
 
-  const formatText = (text: string) => text.replace(/\s*\[cite:\s*\d+\]/g, '');
+  const formatText = (text: string) => cleanCitations(text);
 
   return (
     <div className="bg-rose-50 p-6 rounded-2xl border border-rose-200 mb-6">
-      <h3 className="text-lg font-bold text-rose-900 mb-2">{title}</h3>
-      <p className="text-rose-800 text-sm mb-4">{description.replace(/\[cite:\s*\d+\]/g, '')}</p>
+      <h3 className="text-lg font-bold text-rose-900 mb-2">{cleanCitations(title)}</h3>
+      <p className="text-rose-800 text-sm mb-4">{cleanCitations(description)}</p>
       
       <div className="space-y-4">
         {suggestedRewards && suggestedRewards.length > 0 && (
