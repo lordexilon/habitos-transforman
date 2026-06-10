@@ -24,16 +24,15 @@ export const useAuth = () => useContext(AuthContext);
 
 /**
  * Registra el Service Worker con reintentos.
- * El SW de @ducanh2912/next-pwa ya importa sw-push.js en producción.
- * En desarrollo el PWA está deshabilitado, por lo que usamos sw-push.js directamente.
+ * Vercel tiene problemas sirviendo sw.js generado dinámicamente en /public,
+ * por lo que registramos directamente nuestro sw-push.js que es un asset estático.
  */
 async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) return null;
 
   try {
-    // En producción el SW principal ya existe (generado por next-pwa)
-    // En desarrollo registramos sw-push.js directamente para testeo
-    const swUrl = process.env.NODE_ENV === 'production' ? '/sw.js' : '/sw-push.js';
+    // Usamos el estático garantizado para que no tire 404 en Vercel
+    const swUrl = '/sw-push.js';
     const registration = await navigator.serviceWorker.register(swUrl, { scope: '/' });
     console.log('✅ Service Worker registrado:', registration.scope);
     return registration;
@@ -42,6 +41,7 @@ async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null
     return null;
   }
 }
+
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
