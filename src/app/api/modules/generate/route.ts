@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { buildModulePrompt } from '@/lib/modulePromptBuilder';
 import { createClient } from '@/lib/supabase/server';
-import fs from 'fs';
-import path from 'path';
+import mockModule1 from '@/../content/01-como-funcionan.json';
+import mockModule2 from '@/../content/02-sistemas.json';
+import mockModule3 from '@/../content/03-erradicacion.json';
+import mockModule4 from '@/../content/04-ecosistema.json';
 
 export const maxDuration = 120; // 120s timeout para modelos externos
 
@@ -15,17 +17,9 @@ function getLevelRange(points: number): number {
 
 // Cargar fallback local de forma segura
 function getLocalFallback(moduleId: number): any {
-  try {
-    const filename = moduleId === 1 ? '01-como-funcionan.json' :
-                     moduleId === 2 ? '02-sistemas.json' :
-                     moduleId === 3 ? '03-erradicacion.json' : '04-ecosistema.json';
-    const filePath = path.join(process.cwd(), 'content', filename);
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(fileContent);
-  } catch (err) {
-    console.error("❌ Fallo obteniendo fallback local:", err);
-    return null;
-  }
+  return moduleId === 1 ? mockModule1 :
+         moduleId === 2 ? mockModule2 :
+         moduleId === 3 ? mockModule3 : mockModule4;
 }
 
 export async function POST(req: Request) {

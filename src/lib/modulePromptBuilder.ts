@@ -123,6 +123,7 @@ REGLAS DE FORMATO:
    - Para erradicación: "/images/mod3_theory1_stress_1780950261409.png", "/images/mod3_theory2_replace_1780950273238.png", "/images/mod3_theory3_but_1780950284324.png"
    - Para ecosistema: "/images/mod4_theory1_health_1780950294412.png", "/images/mod4_theory2_family_1780950304402.png"
 5. CRÍTICO: Cuando listes conceptos secuenciales (como las 3 R: Recordatorio, Rutina, Recompensa), usa saltos de línea dobles (\\n\\n) y destaca los nombres de los conceptos en negrita simple con doble asterisco (ej: **1. Recordatorio**: ..., **2. Rutina**: ..., **3. Recompensa**: ...). Esto es indispensable para que el frontend los muestre como una lista vertical estructurada y ordenada en lugar de un bloque de texto plano.
+6. ACUMULACIÓN DE CONTENIDO: Si el nivel del usuario es Nivel 2 o Nivel 3, debes generar el contenido en forma acumulativa. Esto significa que debes mantener las explicaciones y las secciones interactivas fundamentales de los niveles anteriores, pero agregando nuevas secciones de teoría y nuevos retos interactivos más profundos correspondientes a su nivel actual. Todo debe estar en el mismo JSON de modo que el usuario vea su contenido previo sumado al nuevo.
 
 Formato del JSON esperado:
 {

@@ -74,8 +74,22 @@ export default function WeeklyEvaluationModal({
   const handleClaimPoints = () => {
     setIsClaimed(true);
     const currentPoints = Number(localStorage.getItem(`user_points_${userId}`) || '0');
-    localStorage.setItem(`user_points_${userId}`, (currentPoints + challengePoints).toString());
+    const newPoints = currentPoints + challengePoints;
+    localStorage.setItem(`user_points_${userId}`, newPoints.toString());
     window.dispatchEvent(new Event('pointsUpdated'));
+
+    // Disparar la autogeneración automática del nuevo contenido de los 4 módulos en segundo plano
+    if (userId !== 'guest') {
+      console.log("🔄 Autogenerando nuevo contenido para los 4 módulos (Nivel actualizado)...");
+      fetch('/api/modules/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ moduleId: 1, points: newPoints })
+      }).catch(err => {
+        console.error("Fallo al autogenerar módulos en segundo plano:", err);
+      });
+    }
+
     onSuccess();
   };
 
