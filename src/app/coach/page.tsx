@@ -382,7 +382,6 @@ export default function CoachChat() {
                     : 'bg-white text-gray-800 rounded-bl-none border border-gray-100'
                 }`}
               >
-                {/* Indicador de mensaje de voz */}
                 {msg.isVoice && (
                   <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider opacity-60 mb-1 block">
                     🎤 {msg.role === 'user' ? 'Voz' : 'Coach en voz'}
@@ -396,6 +395,18 @@ export default function CoachChat() {
                       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
                   }}
                 />
+                {msg.role === 'assistant' && msg.content && !isTyping && (
+                  <div className="mt-3 pt-2 border-t border-gray-100 flex justify-start">
+                    <button
+                      onClick={() => { setIsSpeaking(true); speak(msg.content.replace(/\*/g, ''), () => setIsSpeaking(false)); }}
+                      className="flex items-center gap-1.5 text-indigo-500 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1.5 rounded-lg transition-colors active:scale-95"
+                      title="Reproducir audio"
+                    >
+                      <Volume2 className="w-3.5 h-3.5" />
+                      <span className="text-[10px] font-black uppercase tracking-wider">Escuchar</span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               {msg.role === 'user' && (
